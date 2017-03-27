@@ -2011,11 +2011,61 @@ defineSuite([
 
     it('throws if fract function takes an invalid number of arguments', function() {
         expect(function() {
-            return new Expression('log2()');
+            return new Expression('fract()');
         }).toThrowDeveloperError();
 
         expect(function() {
-            return new Expression('log2(1, 2)');
+            return new Expression('fract(1, 2)');
+        }).toThrowDeveloperError();
+    });
+
+    it('evaluates length function', function() {
+        var expression = new Expression('length(2.0)');
+        expect(expression.evaluate(frameState, undefined)).toEqual(2.0);
+
+        expression = new Expression('length(vec2(3.0, 4.0))');
+        expect(expression.evaluate(frameState, undefined)).toEqual(5.0);
+
+        expression = new Expression('length(vec3(2.0, 3.0, -4.0))');
+        expect(expression.evaluate(frameState, undefined)).toEqualEpsilon(Math.sqrt(2 * 2 + 3 * 3 + 4 * 4), CesiumMath.EPSILON10);
+
+        expression = new Expression('length(vec4(2.0, -3.0, 4.0, -5.0))');
+        expect(expression.evaluate(frameState, undefined)).toEqualEpsilon(Math.sqrt(2 * 2 + 3 * 3 + 4 * 4 + 5 * 5), CesiumMath.EPSILON10);
+    });
+
+    it('throws if length function takes an invalid number of arguments', function() {
+        expect(function() {
+            return new Expression('length()');
+        }).toThrowDeveloperError();
+
+        expect(function() {
+            return new Expression('length(1, 2)');
+        }).toThrowDeveloperError();
+    });
+
+    it('evaluates normalize function', function() {
+        var expression = new Expression('normalize(5.0)');
+        expect(expression.evaluate(frameState, undefined)).toEqual(1.0);
+
+        expression = new Expression('normalize(vec2(3.0, 4.0))');
+        expect(expression.evaluate(frameState, undefined)).toEqual(new Cartesian2(0.6, 0.8));
+
+        expression = new Expression('normalize(vec3(2.0, 3.0, -4.0))');
+        var length = Math.sqrt(2 * 2 + 3 * 3 + 4 * 4);
+        expect(expression.evaluate(frameState, undefined)).toEqualEpsilon(new Cartesian3(2.0 / length, 3.0 / length, -4.0 / length), CesiumMath.EPSILON10);
+
+        expression = new Expression('normalize(vec4(-2.0, 3.0, -4.0, 5.0))');
+        length = Math.sqrt(2 * 2 + 3 * 3 + 4 * 4 + 5 * 5);
+        expect(expression.evaluate(frameState, undefined)).toEqual(new Cartesian4(-2.0 / length, 3.0 / length, -4.0 / length, 5.0/length), CesiumMath.EPSILON10);
+    });
+
+    it('throws if normalize function takes an invalid number of arguments', function() {
+        expect(function() {
+            return new Expression('fract()');
+        }).toThrowDeveloperError();
+
+        expect(function() {
+            return new Expression('fract(1, 2)');
         }).toThrowDeveloperError();
     });
 
@@ -2292,7 +2342,7 @@ defineSuite([
         }).toThrowDeveloperError();
     });
 
-    it('throws if min function takes mismatching types', function() {
+    it('throws if max function takes mismatching types', function() {
         var expression = new Expression('max(0.0, vec2(0,1))');
         expect(function() {
             expression.evaluate(frameState, undefined);
@@ -2303,7 +2353,6 @@ defineSuite([
             expression.evaluate(frameState, undefined);
         }).toThrowDeveloperError();
     });
-
 
     it('evaluates ternary conditional', function() {
         var expression = new Expression('true ? "first" : "second"');

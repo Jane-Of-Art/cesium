@@ -104,7 +104,9 @@ define([
         exp2 : exp2,
         log : Math.log,
         log2 : log2,
-        fract : fract
+        fract : fract,
+        length: length,
+        normalize: normalize
     };
 
     var ternaryFunctions = {
@@ -122,6 +124,42 @@ define([
 
     function log2(number) {
     	return CesiumMath.logBase(number, 2.0);
+    }
+
+    function length(arg) {
+        if (typeof arg === 'number') {
+            return Math.abs(arg);
+        } else if (arg instanceof Cartesian2) {
+            return Cartesian2.magnitude(arg);
+        } else if (arg instanceof Cartesian3) {
+            return Cartesian3.magnitude(arg);
+        } else if (arg instanceof Cartesian4) {
+            return Cartesian4.magnitude(arg);
+        } else {
+            //>>includeStart('debug', pragmas.debug);
+            throw new DeveloperError('Invalid argument type for length() function');
+            //>>includeEnd('debug');
+        }
+    }
+
+    function normalize(arg) {
+        var length;
+        if (typeof arg === 'number') {
+            return 1.0;
+        } else if (arg instanceof Cartesian2) {
+            length = Cartesian2.magnitude(arg);
+            return Cartesian2.fromElements(arg.x / length, arg.y / length, ScratchStorage.getCartesian2());
+        } else if (arg instanceof Cartesian3) {
+            length = Cartesian3.magnitude(arg);
+            return Cartesian3.fromElements(arg.x / length, arg.y / length, arg.z / length, ScratchStorage.getCartesian3());
+        } else if (arg instanceof Cartesian4) {
+            length = Cartesian4.magnitude(arg);
+            return Cartesian4.fromElements(arg.x / length, arg.y / length, arg.z / length, arg.w / length, ScratchStorage.getCartesian4());
+        } else {
+            //>>includeStart('debug', pragmas.debug);
+            throw new DeveloperError('Invalid argument type for normalize() function');
+            //>>includeEnd('debug');
+        }
     }
 
     /**
@@ -773,7 +811,7 @@ define([
         var evaluate = unaryFunctions[call];
         return function(feature) {
             var left = this._left.evaluate(feature);
-            if (typeof left === 'number') {
+            if (typeof left === 'number' || call === 'length' || call === 'normalize') {
                 return evaluate(left);
             } else if (left instanceof Cartesian2) {
                 return Cartesian2.fromElements(evaluate(left.x), evaluate(left.y), ScratchStorage.getCartesian2());
@@ -827,7 +865,6 @@ define([
     function getEvaluateTernaryFunction(call) {
         var evaluate = ternaryFunctions[call];
         return function(feature) {
-
             var left = this._left.evaluate(feature);
             var right = this._right.evaluate(feature);
             var test = this._test.evaluate(feature);
