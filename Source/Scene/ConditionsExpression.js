@@ -51,10 +51,10 @@ define([
 
         // Insert expression to expressions if it exists
         // Then evaluate using expressions throughout class
-        this._expression = conditionsExpression.expression; // this has to stay in prototype for tests to keep running
+        // this._expression has to stay in prototype for specs to keep passing, but it can be removed in the future.
+        this._expression = conditionsExpression.expression;
         this._expressions = conditionsExpression.expressions || {};
         this._expressions.expression = conditionsExpression.expression;
-
         this._runtimeConditions = undefined;
 
         setRuntime(this);
@@ -160,7 +160,7 @@ define([
             var length = conditions.length;
             for (var i = 0; i < length; ++i) {
                 var statement = conditions[i];
-                if (statement.condition.evaluate(frameState, feature)) {
+                if (statement.condition && statement.condition.evaluate(frameState, feature)) {
                     return statement.expression.evaluateColor(frameState, feature, result);
                 }
             }
@@ -216,102 +216,3 @@ define([
 
     return ConditionsExpression;
 });
-
----
-
-var expressionPlaceholder = new RegExp('${expression}', 'g');
-undefined
-'${expression} > 25'.replace(expressionPlaceholder, 'YES');
-"${expression} > 25"
-'${expression} > 25 - ${expression}'.replace(expressionPlaceholder, 'YES');
-"${expression} > 25 - ${expression}"
-expressionPlaceholder
-/${expression}/g
-var expressionPlaceholder = new RegExp('\$\{expression\}', 'g');
-undefined
-'${expression} > 25 - ${expression}'.replace(expressionPlaceholder, 'YES');
-"${expression} > 25 - ${expression}"
-'\$\{expression\} > 25 - \$\{expression\}'.replace(expressionPlaceholder, 'YES');
-"${expression} > 25 - ${expression}"
-('\$\{expression\} > 25 - \$\{expression\}').replace(expressionPlaceholder, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp('\$\{expression\}', 'g');
-undefined
-('\$\{expression\} > 25 - \$\{expression\}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp('\$\{expression\}', 'g');
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp('\$\{expression?\}', 'g');
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp('${expression}', 'g');
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp(\$\{expression\}, 'g');
-VM12934:1 Uncaught SyntaxError: Invalid or unexpected token
-var reg = \$\{test\}\g
-VM12985:1 Uncaught SyntaxError: Invalid or unexpected token
-"{expression}".match(/expression/)
-    ["expression"]
-"{expression}".match(/\{expression/)
-    ["{expression"]
-"{expression}".match(/\{expression\}/)
-    ["{expression}"]
-"{expression}".match(/\$\{expression\}/)
-null
-"${expression}".match(/\$\{expression\}/)
-    ["${expression}"]
-var toReplace = new RegExp('/\$\{expression\}/', 'g');
-undefined
-"${expression}".match(/\$\{expression\}/)
-    ["${expression}"]
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-"${expression}".match(toReplace)
-null
-var toReplace = new RegExp('/\$\{expression\}/', 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp(/\$\{expression\}/, 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"YES > 25 - YES"
-var toReplace = new RegExp(/\$\{expression\}/, 'g')
-undefined
-var key = 'expression'
-undefined
-var toReplace = new RegExp('/\$\{' + key + '\}/', 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp('\$\{' + key + '\}', 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp("\$\{" + key + "\}", 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var toReplace = new RegExp(/\$\{expression\}/, 'g')
-undefined
-var str = '\$\{' + key + '\}'
-undefined
-str
-"${expression}"
-var toReplace = new RegExp(str, 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"${expression} > 25 - ${expression}"
-var str = '\\$\\{' + key + '\\}'
-undefined
-str
-"\$\{expression\}"
-var toReplace = new RegExp("\\$\\{" + key + "\\}", 'g')
-undefined
-('${expression} > 25 - ${expression}').replace(toReplace, 'YES');
-"YES > 25 - YES"
