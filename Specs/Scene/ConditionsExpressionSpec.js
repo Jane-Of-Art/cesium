@@ -53,6 +53,31 @@ defineSuite([
         ]
     };
 
+    var jsonExpWithMultipleExpressions = {
+        expressions : {
+            halfHeight: '${Height}/2',
+            quarterHeight: '${Height}/4'
+        },
+        conditions : [
+            ['${expression} > 50 && ${expression} < 100', 'color("blue")'],
+            ['${expression} > 25 && ${expression} < 26', 'color("red")'],
+            ['true', 'color("lime")']
+        ]
+    };
+
+    var jsonExpWithMixedExpressions = {
+        expression: '${Height}',
+        expressions : {
+            halfHeight: '${Height}/2',
+            quarterHeight: '${Height}/4'
+        },
+        conditions : [
+            ['${expression} > 50 && ${expression} < 100', 'color("blue")'],
+            ['${expression} > 25 && ${expression} < 26', 'color("red")'],
+            ['true', 'color("lime")']
+        ]
+    };
+
 
     it('constructs', function() {
         var expression = new ConditionsExpression(jsonExp);
